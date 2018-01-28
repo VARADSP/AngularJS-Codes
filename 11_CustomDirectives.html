@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Controllers </title>
+  <script src="angular.min.js"></script>
+  <script type="text/javascript">
+    var app = angular.module("app",[]);
+    app.controller("emp",['$scope',function($scope){
+
+      $scope.msg = "This is first Message";
+
+    }]);
+
+    app.controller('ajax',['$scope',function($scope){
+
+
+    }]);
+
+    //directive for making custom content onDemand
+    app.directive("myInfoMsg",function(){
+      //myInfoMsg Naming convention converted to my-info-msg
+
+        return{
+          templateUrl:"my-info-msg.html"
+          //template:"<strong>MESSAGE</strong>"
+        };
+    });
+
+
+    app.controller('emp',['$scope','empService',function($scope){
+          $scope.doSearch = function(){
+        empService.findEmployeeId($scope.searchEmpno,function(r){
+
+          $scope.empno = r.empno;
+          $scope.ename = r.ename;
+          $scope.sal = r.sal;
+          $scope.deptno = r.deptno;
+          $scope.hiredate = r.hiredate;
+          $scope.dob = r.dob;
+          $scope.salAbove7k = parseInt(r.sal)>7000;
+
+        });
+      };
+    }]);
+    app.service('empService',['$http','$log',function($http,$log){
+      this.findEmployeeId = function(empno,cb){
+        $http({
+          url:'http://localhost:8000/api/employees',
+          method:'GET'
+        }).then(function(resp){
+          cb(resp.data);
+        },function(resp){
+          $log.error("Error Occurred");
+        });
+      };
+    }]);
+
+    app.directive('empDetails',function(){
+      return{
+        templateUrl:'emp-details.html'
+      }
+    });
+  </script>
+</head>
+<body ng-app="app">
+
+  <script type="text/ng-template" id="my-info-msg.html">
+    <!-- separate Files can be used -->
+    <strong>{{msg}}</strong>
+    <!-- Message Coming from $scope -> msg-->
+  </script>
+
+  <script type="text/ng-template" id="emp-details.html">
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h4>Employee Details</h4>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-4"><strong>Employee No:</strong></div>
+              <div class="col-sm-7">{{empno}}</div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4"><strong>Employee Name:</strong></div>
+              <div class="col-sm-7">{{ename}}</div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4"><strong>Employee Hire Date:</strong></div>
+              <div class="col-sm-7">{{hiredate | date:'medium'}}</div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4"><strong>Employee Dob:</strong></div>
+              <div class="col-sm-7">{{dob | date:'medium'}}</div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4"><strong>Department:</strong></div>
+              <div class="col-sm-7">{{deptno}}</div>
+            </div>
+        </div>
+      </div>
+  </script>
+
+
+  <div ng-controller="emp">
+    <div my-info-msg>
+      <!-- my-info-msg returning a complete template -->
+    </div>
+    <!-- Another Way to include template
+    <my-info-msg>
+
+    </my-info-msg>
+
+    -->
+  </div>
+
+
+    <div ng-controller="ajax">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>Enter Employee No:</label>
+                <input type="text" class="form-control" ng-model="searchEmpno"/>
+
+            </div>
+            <button class="btn btn-primary" ng-click="doSearch()">Search</button>
+        </form>
+
+        <hr>
+        <div emp-details ng-if  ="empno != undefined"></div>
+    </div>
+
+
+</body>
+</html>

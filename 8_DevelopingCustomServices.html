@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>One/Two Way Data Binding</title>
+  <script src="angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("app",[]);
+        app.controller("emp",["$scope",'calcService',function($scope,calcFactory){
+
+                    $scope.a=10;
+                    $scope.b=20;
+
+              $scope.doDoubleAndSum = function(){ // Executed on ng-click
+                $scope.a = $scope.a *2;
+                $scope.b = $scope.b *2;
+
+                $scope.sum = parseInt($scope.a) + parseInt($scope.b);
+
+              };
+
+
+              $scope.doSum = function(){
+                  //Synchronous Way of doing things
+                      //$scope.sum = calcFactory.getSum($scope.a,$scope.b);
+
+                //Asynchronous Way of doing things this way is better
+                calcFactory.getSum($scope.a,$scope.b,function(r){
+                  $scope.sum =r ;
+                });
+              };
+        }]);
+      //Developing Custom Service
+      //factory
+      //Service
+      //Provider
+
+      // 1. factory method for Developing Custom Service
+      app.factory('calcFactory',['$http','$log',function($http,$log){
+                $log.log("Instantiating calcFactory...");
+                var oCalcService = {};
+          //      oCalcService.getSum = function(a,b){
+          //          return parseInt(a)+parseInt(b);
+          //      };
+              oCalcService.getSum = function(a,b,callback){
+                var s = parseInt(a) + parseInt(b);
+                callback(s);
+              };
+
+              /*
+              this.getSum - function(a,b,cb){
+              $http({
+              url:'http://localhost:4467/Sum?a='+a+ '&b='+b,
+              method:'GET'
+            }).then(function(resp){
+            $log.log(resp.data);
+            callback(resp.data);
+          },function(resp){
+          $log.error("Error Occurred");
+        });
+            }
+              */
+
+                return oCalcService;
+
+      }]);
+
+      // 2. Service for Developing Custom Service
+
+      app.service('calcService',['$http','$log',function($http,$log){
+                $log.log("Instantiating calcService...");
+
+            //  this.getSum = function(a,b){
+            //    return parseInt(a)+parseInt(b);
+            //  };
+
+            this.getSum = function(a,b,cb){
+              var s =parseInt(a)+parseInt(b);
+              cb(s);
+            };
+
+          //      oCalcService.getSum = function(a,b){
+          //          return parseInt(a)+parseInt(b);
+          //      };
+              //oCalcService.getSum = function(a,b,callback){
+              //  var s = parseInt(a) + parseInt(b);
+            //    callback(s);
+            //  };
+
+              /*
+              oCalcService.getSum - function(a,b,cb){
+              $http({
+              url:'http://localhost:4467/Sum?a='+a+ '&b='+b,
+              method:'GET'
+            }).then(function(resp){
+            $log.log(resp.data);
+            callback(resp.data);
+          },function(resp){
+          $log.error("Error Occurred");
+        });
+            }
+              */
+
+              //  return oCalcService;
+
+      }]);
+
+    // 3. Provider for Developing Custom Service
+    app.provider('calcService',function(){
+
+        this.$get = ['$log','$http',function($log,$http){
+          $log.log("Instantiating calcServiceProvider ...");
+          var oCalcService = {};
+        //  oCalcService.getSum = function(a,b,cb){
+        //    var s = parseInt(a)+parseInt(b);
+        //    cb(s);
+        //  };
+          oCalcService.getSum = function(a,b,cb){
+            $http({
+              url:'http://localhost:4467/Sum?a='+a+'&b='+b,
+              method:'GET'
+
+            }).then(function(resp){
+              $log.log(resp.data);
+              cb(resp.data);
+            },function(resp){
+              $log.error("Error Occurred");
+            });
+          };
+
+          return oCalcService;
+
+        }];
+
+    });
+
+    app.config(['calcServiceProvider',function(calcServiceProvider){
+
+
+    }]);
+
+
+
+    </script>
+</head>
+<body ng-app="app">
+  <div ng-controller="emp">
+    <div>
+      Value of a is {{a}}
+      Value of b is {{b}}
+    </div>
+    <hr>
+    Value of a is <span ng-bind="a"></span>
+    Value of b is <span ng-bind="b"></span> <!-- One Way Binding -->
+
+    <hr>
+      Sum : {{sum}}<br>
+
+    <button ng-click="doDoubleAndSum()">Double N Calculate </button>
+      <hr>
+      Initial Value of a {{::a}} <!-- One Time Binding -->
+
+
+      <!-- Two Way Binding -->
+
+      <hr>
+      For New Sum
+      Set Value for a : {{a}} <input type="text" ng-model="a">
+      Set Value for b : {{b}} <input type="text" ng-model="b">
+
+      Value of sum2 {{sum}}<br>
+       <button ng-click="doSum()">Calculate New sum</button>
+
+
+
+  </div>
+
+
+</body>
+</html>

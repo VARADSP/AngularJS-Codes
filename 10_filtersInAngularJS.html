@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>AngularJS Filters </title>
+  <script src="angular.min.js"></script>
+  <script type="text/javascript">
+  var app = angular.module("app",[]);
+  app.controller("emp",['$scope','empService',function($scope,empService){
+          $scope.doSearch = function(){
+            empService.findEmployeeId($scope.searchEmpno,function(r){
+
+                  $scope.employees = r;
+                  //employees table formed       
+                  $scope.empno = r.empno;
+                  $scope.ename = r.name;
+                  $scope.sal = r.sal;
+                  $scope.deptno = r.deptno;
+                  $scope.hiredate = r.hiredate;
+                  $scope.dob = r.dob;
+                  $scope.tpText = "Hi man This is timepass text";
+            });
+          };
+
+
+  }]);
+
+  app.service('empService',['$http','$log',function($http,$log){
+        this.findEmployeeId = function(empno,cb){
+          $http({
+            url:'http://localhost:8000/api/employee/'+empno,
+            method :'GET'
+          }).then(function(resp){
+            cb(resp.data);
+          },function(resp){
+            $log.error("Error Occured");
+            debugger;
+          });
+        };
+  }]);
+  </script>
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+    <script type="text/javascript" src="jqeury-3.2.1.min.js"></script>
+    <script type="text/javascript" src="boostrap.min.js"></script>
+</head>
+
+
+<body ng-app="app"><!-- <body ng-app="app" ng-controller="emp as o">-->
+
+    <div ng-controller="emp">
+      <form class="form-inline">
+      <div class="form-group">
+          <label>Enter Employee No</label>
+          <input class="form-control" type="text" ng-model="searchEmpno">
+          </div>
+          <button class="btn btn-primary" ng-click="doSearch()">Search</button>
+        </form>
+        <hr>
+        <div class="row">
+            <div class="col-sm-2">
+              EmployeeNo
+            </div>
+            <div class="col-sm-2">
+              {{empno}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+              EmployeeName
+            </div>
+            <div class="col-sm-2">
+              {{ename | uppercase}}
+
+              <!-- Filter Applied
+                      uppercase is a filter
+                      number is a filter
+             -->
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+              EmployeeSalary
+            </div>
+            <div class="col-sm-2" ng-bind="tpText">
+              {{sal | number:2}} <!-- Filter Applied number:2 2 for 2 decimels -->
+              {{sal | currency:"$":2}} <!-- currency filter applied -->
+              {{tpText | uppercase}}
+              <span ng-if="sal > 5000" class="glyphicon glyphicon-warning-sign"></span>
+              <span ng-show="sal > 5000" class="glyphicon glyphicon-warning-sign"></span>
+          <span ng-hide="sal > 5000 || sal==undefined" class="glyphicon glyphicon-warning-sign"></span>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+              Employee Hire Date
+            </div>
+            <div class="col-sm-2">
+              {{hiredate | date:'shortDate'}}<!-- date filter applied -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+              Employee Date of Birth
+            </div>
+            <div class="col-sm-2">
+              {{dob}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+              Department
+            </div>
+            <div class="col-sm-2">
+              {{deptno}}
+            </div>
+        </div>
+    </div>
+
+<!--
+  <tr ng-repeat="oEmp in employees | filter:{ename : 's',deptno:'20'}">
+
+  <input ng-model="qSearchDept"> Enter the value here
+  <tr ng-repeat="oEmp in employees | filter:{deptno:qSearchDept}">  Filtered Here
+
+  <td>{{oEmp.empno}}</td>
+  <td>{{oEmp.ename}}</td>
+  <td>{{oEmp.sal}}
+      <span ng-show="oEmp.sal > 7000" class="glyphicon glyphicon-book"></span>
+    </td>
+    <td>{{oEmp.deptno}}</td>
+  </tr>
+
+
+
+-->
+
+
+</body>
+</html>

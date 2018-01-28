@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>One/Two Way Data Binding</title>
+  <script src="angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("app",[]);
+        app.controller("emp",["$scope",function($scope){
+
+                    $scope.a=10;
+                    $scope.b=20;
+
+              $scope.doDoubleAndSum = function(){ // Executed on ng-click
+                $scope.a = $scope.a *2;
+                $scope.b = $scope.b *2;
+
+                $scope.sum = parseInt($scope.a) + parseInt($scope.b);
+
+              };
+
+
+              $scope.doSum = function(){
+
+                $scope.sum = parseInt($scope.a) + parseInt($scope.b);
+
+              };
+        }]);
+
+    </script>
+</head>
+<body ng-app="app">
+  <div ng-controller="emp">
+    <div>
+      Value of a is {{a}}
+      Value of b is {{b}}
+    </div>
+    <hr>
+    Value of a is <span ng-bind="a"></span>
+    Value of b is <span ng-bind="b"></span> <!-- One Way Binding -->
+
+    <hr>
+      Sum : {{sum}}<br>
+
+    <button ng-click="doDoubleAndSum()">Calculate </button>
+      <hr>
+      Initial Value of a {{::a}} <!-- One Time Binding -->
+
+
+      <!-- Two Way Binding -->
+
+      <hr>
+      For New Sum
+      Set Value for a : {{a}} <input type="text" ng-model="a">
+      Set Value for b : {{b}} <input type="text" ng-model="b">
+
+      Value of sum2 {{sum}}<br>
+       <button ng-click="doSum()">Calculate New sum</button>
+
+
+
+  </div>
+
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Controllers </title>
+  <script src="angular.min.js"></script>
+  <script type="text/javascript">
+    var sample = angular.module("sample",[]).run(["$rootScope",function($rootScope){
+
+      $rootScope.TaxPercent = 30;
+      $rootScope.vsp="Jiren";
+
+
+    }]);
+
+    sample.controller("emp",["$scope",function($scope){
+      $scope.Name = "VSP";
+
+
+    }]);
+
+    sample.controller("empDetails",function($scope){
+
+      $scope.Sal = 3400;
+      $scope.Dept = "Sales";
+
+    });
+
+    sample.controller("empPayCheck",["$scope","$rootScope",function($scope,$rootScope){
+
+      $scope.bark = function(){
+        return $rootScope.vsp;
+      }
+
+      $scope.getTaxes = function(){
+
+        return $scope.Sal*$rootScope.TaxPercent/100;
+      };
+      $scope.getNet = function(){
+        return $scope.Sal - $scope.getTaxes();
+      };
+    }]);
+
+  </script>
+</head>
+<body ng-app="sample"><!-- <body ng-app="sample" ng-controller="emp as o">-->
+  <div ng-controller="emp">
+    Hello {{Name}}
+      <div ng-controller="empDetails">
+          <strong>{{Name}} </strong> Earns {{Sal}} and works in {{Dept}} Department
+
+          <div ng-controller="empPayCheck">
+                  Taxes {{getTaxes()}} <br>
+                  Net : {{getNet()}}
+                  And The Name is : {{bark() }}
+          </div>
+      </div>
+  </div>
+
+
+</body>
+</html>
