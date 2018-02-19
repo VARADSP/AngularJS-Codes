@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Using $apply and $digest</title>
+  <script src="angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("app",[]);
+        app.controller("emp",["$scope",function($scope){
+
+                    $scope.a=10;
+                    $scope.b=20;
+
+                    $scope.s = 0;
+
+
+
+                    $scope.calcSum = function(){
+                      $scope.s = Number($scope.a) + Number($scope.b);
+
+                    }
+
+
+
+              }]);
+
+              app.controller("msg",["$scope",function($scope){
+
+                  $scope.data = [
+                          {v:17,r:0},
+                          {v:24,r:0},
+                          {v:34,r:0},
+                          {v:64,r:0},
+
+
+                  ];
+                  $scope.getTotal=function(){
+                    var s = 0;
+
+                      for (var i = $scope.data.length-1; i >= 0; i--) {
+                        var o = $scope.data[i];
+                        s += o.r;
+                      }
+
+                    return s;
+                  };
+
+              }]);
+
+                app.directive('message',function(){
+                      return{
+
+                        templateUrl : 'message.html',
+                        compile:function(tElement,tAttributes){
+                          return function(scope,iElement,iAttributes,controller){
+
+                            iElement.find("#btnSum").on("click",scope.btnClick);
+
+                          }
+                        },
+                        controller:function($scope,$element,$attrs){
+                          $scope.btnClick = function(){
+                            $scope.o.r = $scope.o.v * $scope.o.v;
+                            $scope.$apply();
+                          }
+                        }
+                      }
+
+                });
+
+              var btnClick = function(){
+                var scope = angular.element($("#div1")).scope();
+
+                scope.s = Number(scope.a) + Number(scope.b);
+
+
+              }
+</script>
+</head>
+<body ng-app="app">
+  <div id="div1" ng-controller="emp">
+      a = <input ng-model="a">
+      <div> a = {{a}} </div>
+    <hr />
+
+    b = <input ng-model="b">
+    <div> b = {{b}} </div>
+    <hr />
+
+    <button ng-click="calcSum()">Calc Sum </button>
+
+    <button onclick="btnClick()">Sum</button>
+    <div> Sum = {{s}}</div>
+
+    <div> Sum  = {{s}} </div>
+
+
+  </div>
+
+  <div ng-controller="msg">
+    <div message ng-repeat="o in data">
+    </div>
+
+      <div> Total = {{getTotal()}}</div>
+
+  </div>
+  <script type="text/ng-template" id="message.html">
+    <!-- separate Files can be used -->
+    <strong>{{o.v}}</strong>
+
+    <!-- Message Coming from $scope -> msg-->
+
+    <button ng-click="btnClick()">Calc Square In Message.html</button>
+    <button id="btnSum">Square</button>
+
+      result = {{o.r}}
+  </script>
+
+
+
+  <script src="jquery-3.2.1.min.js"></script>
+</body>
+</html>

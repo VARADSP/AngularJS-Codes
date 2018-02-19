@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Digest Cycle / Process </title>
+  <script src="angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("app",[]);
+        app.controller("emp",["$scope","$rootScope",function($scope,$rootScope){
+
+                    $scope.a=10;
+                    $scope.b=20;
+                    $scope.c = 30;
+
+
+
+
+                    $scope.$watch("a",function(newValue,oldValue){
+                      if(newValue != oldValue){
+                        console.log("a modified to " + newValue);
+                      }
+                    });
+
+                    $scope.$watch("b",function(newValue,oldValue){
+                      if(newValue != oldValue){
+                        console.log("b modified to " + newValue);
+                      }
+                    });
+
+
+                    $scope.$watch("c",function(newValue,oldValue){
+                      if(newValue != oldValue){
+                        console.log("c modified to " + newValue);
+                      }
+                    });
+
+                    $rootScope.$watch(function(){
+                      console.log("-- Digest Iteration Started-- ");
+                    })
+
+                    $scope.o = {
+                      a:1,
+                      b:2,
+                      c:5
+                    };
+
+        // Introducing Watch
+
+          //Equality Watch !
+      //      $scope.$watch("o",function(newValue,oldValue){
+
+        //        if(newValue != oldValue){
+          //        $scope.o.c = $scope.o.a * $scope.o.b;
+          //      }
+
+        //},true);
+
+        $scope.$watchGroup(['o.a','o.b'],function(newValue,oldValue){
+
+            if(newValue != oldValue){
+              $scope.o.c = $scope.o.a * $scope.o.b;
+            }
+
+        },true);
+
+
+        }]);
+
+
+    </script>
+</head>
+<body ng-app="app">
+  <div ng-controller="emp">
+
+    a = <input ng-model="a">
+    <div>
+      Value of a from input {{a}}
+    </div>
+
+    <div>
+      Value of a {{o.a}}
+    </div>
+
+
+    <div>
+      Value of b is {{o.b}}
+    </div>
+    <div>
+      Value of c is {{o.c}}
+    </div>
+
+  </div>
+
+
+</body>
+</html>

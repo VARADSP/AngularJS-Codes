@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>One/Two Way Data Binding</title>
+  <script src="angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("app",[]);
+        app.controller("emp",["$scope",function($scope){
+
+                    $scope.a=10;
+                    $scope.b=20;
+                    $scope.c = 30;
+
+                    $scope.o = {
+                      a:1,
+                      b:2,
+                      c:5
+                    };
+
+        // Introducing Watch
+
+          //Equality Watch !
+      //      $scope.$watch("o",function(newValue,oldValue){
+
+        //        if(newValue != oldValue){
+          //        $scope.o.c = $scope.o.a * $scope.o.b;
+          //      }
+
+        //},true);
+
+        $scope.$watchGroup(['o.a','o.b'],function(newValue,oldValue){
+
+            if(newValue != oldValue){
+              $scope.o.c = $scope.o.a * $scope.o.b;
+            }
+
+        },true);
+
+
+        }]);
+
+
+    </script>
+</head>
+<body ng-app="app">
+  <div ng-controller="emp">
+
+    a = <input ng-model="o.a">
+
+    <div>
+      Value of a {{o.a}}
+    </div>
+
+
+    <div>
+      Value of b is {{o.b}}
+    </div>
+    <div>
+      Value of c is {{o.c}}
+    </div>
+
+  </div>
+
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Dealing with $eval vs $parse vs $interpolate</title>
+    <script src="angular.min.js"></script>
+
+    <script type="text/javascript">
+          var app = angular.module("app",[]);
+
+          app.controller("sample",["$scope","$parse","$interpolate",function($scope,$parse,$interpolate){
+
+              $scope.a = 10;
+              $scope.b = 20;
+
+                $scope.emp = {
+                  address: {
+                    city:"Austin"
+                  }
+                };
+
+            $scope.demo = function(){
+
+
+
+        //     alert("Result :" + $scope.$eval("a*b"));
+                var e = $scope.$eval("emp.address.city");
+                alert(e);
+
+              var r = $scope.$eval("a*b*3 * c",{
+                c:5,
+                a:2
+              });
+                  console.log(r);
+                    //alert(r);
+
+
+                    var vsp  = $scope.$eval(function(scope,locals){
+                      return scope.a * scope.b* locals.c * locals.a;
+                    },{c:2,a:3});
+                        alert(vsp);
+
+
+                        var r = $scope.$eval(function(scope,locals){
+                          scope.c = locals.c;
+                          //reurn scope.a * scope.b * locals.c * locals.a;
+                          return scope.a * scope.b * scope.c * locals.a;
+                        },{a:3,c:2});
+                        alert(r);
+
+
+
+              };
+
+            $scope.demoParse = function(){
+              var f = $parse("a * b");
+                      // returns a function in f
+                  var res = f($scope); // f function working against scope
+
+                  alert(" Result = " + res);
+
+                //running the expr with new values
+                  var r2 = f({
+                    a:2,b:3
+                  });
+                  alert(r2);
+                //alert("result = " + $parse("a*b")($scope));
+      // modifying scope value with parse
+            console.log($parse("emp.address.city")($scope));
+
+                  $parse("emp.address.city").assign($scope,"Dellas");
+                alert("Result = " + $parse("a*b")({
+                  a:2,
+                  b:3
+                }));
+                console.log($parse("emp.address.city")($scope));
+            };
+
+
+            $scope.demoInterpolate = function(){
+                    var f = $interpolate("{{a*b | currency:'USD$'}}");//filter applied only available with $interpolate
+                    var r1 = f($scope);
+                    alert("Result :" + r1);
+
+            }
+          }]);
+
+
+
+
+
+
+    </script>
+</head>
+<body ng-app="app">
+
+  <div id="div1" ng-controller="sample">
+
+    a = {{a}}<br>
+
+    b = {{b}}<br>
+
+    Result = {{a * b}}
+    <br>
+    <hr>
+      <button ng-click="demo()"> Demo Eval</button>
+      <button ng-click="demoParse()"> Demo Parse</button>
+        {{emp.address.city}}
+        <hr>
+        <button ng-click="demoInterpolate()"> Demo Interpolate</button>
+
+
+  </div>
+
+
+
+
+
+
+
+
+    <script src="jquery-3.2.1.min.js"></script>
+</body>
+</html>

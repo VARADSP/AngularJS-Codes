@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular JS Shared Scope In Directives </title>
+  <script src="angular.min.js"></script>
+  <script src="jquery-3.2.1.min.js"></script>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <script type="text/javascript">
+      var app = angular.module('app',[]);
+      app.controller('sample',['$scope',function($scope){
+                $scope.a = 10;
+                $scope.b = 20;
+
+                $scope.changeValueB = function(){
+                  $scope.b = 30;
+
+                }
+      }]);
+
+      app.directive("message",function(){
+        return {
+          templateUrl:'info-msg.html',
+
+          controller:function($scope,$element,$attrs){
+                $scope.changeValueB = function(){
+                  $scope.b = 40;
+                }
+          }
+        }
+      });
+
+      app.directive("message2",function(){
+        return {
+          templateUrl:'info-msg.html',
+
+          controller:function($scope,$element,$attrs){
+                $scope.changeValueB = function(){
+                  $scope.b = 50;
+                }
+          }
+        }
+      });
+
+  
+
+  </script>
+</head>
+<body ng-app="app">
+  <script type="text/ng-template" id="info-msg.html">
+    <!-- separate Files can be used -->
+    <div> a = {{a}}, b = {{b}}</div>
+    <br>
+    Modify a : <input ng-model="a" />
+    <!-- Message Coming from $scope -> msg-->
+    <button ng-click="changeValueB()">Change Value B</button>
+  </script>
+
+  <div id="div1" ng-controller="sample">
+      Controller : a = {{a}} , b = {{b}}<hr>
+      Modify a : <input ng-model="a">
+
+        <button ng-click="changeValueB()">Change Value B</button>
+  <hr>
+
+  <br>
+    Directive1 Instance 1 :     <div message></div><hr>
+    Directive1 Instance 2 :    <div message></div><hr>
+
+    Directive2 Instance 1 :     <div message2></div><hr>
+    Directive2 Instance 2 :    <div message2></div><hr>
+
+
+
+  </div>
+
+</body>
+</html>
