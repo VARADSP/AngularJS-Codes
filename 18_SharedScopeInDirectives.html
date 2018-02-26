@@ -25,7 +25,7 @@
           templateUrl:'info-msg.html',
 
           controller:function($scope,$element,$attrs){
-                $scope.changeValueB = function(){
+                $scope.changeValueB = function(){ // shared scope changes values everywhere
                   $scope.b = 40;
                 }
           }
@@ -44,7 +44,7 @@
         }
       });
 
-  
+
 
   </script>
 </head>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular JS Transclusion Getting Started </title>
+<script src="jquery-3.2.1.min.js"></script>
+  <script src="angular.min.js"></script>
+
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <script type="text/javascript">
+      var app = angular.module('app',[]);
+      app.controller('sample',['$scope',function($scope){
+
+
+      }]);
+
+
+      app.directive("message1",function(){
+
+        return{
+          templateUrl:'info-msg.html'
+            }
+
+
+      });
+
+
+        // with ng-transclude function
+      app.directive("message2",function(){
+
+        return{
+          templateUrl:'info-msg2.html',
+          transclude:true
+            }
+
+
+      });
+
+      //Transclusion using link function
+      app.directive("message3",function(){
+
+        return{
+          templateUrl:'info-msg3.html',
+          transclude:true,
+          link:function(scope,iElement,iAttrs,controller,transclude){
+            var content = transclude();
+
+            iElement.find("#innerPanel").append(content);
+
+
+          }
+            }
+
+
+      });
+
+      app.directive("message4",function(){
+
+        return{
+          templateUrl:'info-msg4.html',
+          transclude:true,
+          controller:function($scope,$element,$attrs,$transclude){
+            var content = $transclude();
+
+                        $element.find("#innerPanel").append(content);
+
+          }
+            }
+
+
+      });
+
+
+
+
+
+
+
+
+  </script>
+</head>
+<body ng-app="app">
+  <div id="div1" ng-controller="sample">
+
+    This is from the controller
+    <br><hr>
+    Message 1 - Instance 1 <div message1></div><br><hr>
+      Message 1 - Instance 2 <div message1>This is  inner message</div><br><hr>
+          Message 2 - Instance 1 <div message2>This is  inner message safasf</div><br><hr>
+
+              Message 3 - Instance 1 <div message3>This is  inner message</div><br><hr>
+                Message 4 - Instance 1 <div message4>This is  inner message</div><br><hr>
+</div>
+
+
+
+
+  <script type="text/ng-template" id="info-msg.html">
+    <div>
+        This is from info msg template
+
+    </div>
+  </script>
+
+    <script type="text/ng-template" id="info-msg4.html">
+      <div>
+          This is from info msg template
+              <div id="innerPanel" style="color:blue"></div>
+
+      </div>
+    </script>
+
+
+    <script type="text/ng-template" id="info-msg2.html">
+      <div>
+          This is from info msg2 template and following is inner content
+            <div ng-transclude style="color:blue"></div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="info-msg3.html">
+      <div>
+          This is from info msg3 template and following is inner content
+            <div id="innerPanel" style="color:blue">sss</div>
+      </div>
+    </script>
+  
+</body>
+</html>

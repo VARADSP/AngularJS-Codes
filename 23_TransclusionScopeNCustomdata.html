@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular JS Transclusion Scope And Custom Data </title>
+
+    <script src="jquery-3.2.1.min.js"></script>
+  <script src="angular.min.js"></script>
+
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <script type="text/javascript">
+      var app = angular.module('app',[]);
+      app.controller('sample',['$scope',function($scope){
+
+      $scope.a = {
+        x:10
+      }
+
+      }]);
+
+
+    //Shared Scope
+      app.directive("message1",function(){
+
+        return{
+          templateUrl:'msg1.html',
+          transclude:true,
+          controller:function($scope,$element,$attrs){
+            $scope.b = {
+              y:20
+            }
+          }
+        }
+
+
+      });
+
+
+
+          //Inherited Scope
+            app.directive("message2",function(){
+
+              return{
+                templateUrl:'msg1.html',
+                transclude:true,
+                scope:true,
+                controller:function($scope,$element,$attrs){
+                  $scope.b = {
+                    y:20
+                  }
+                }
+              }
+
+
+            });
+
+                      //Isolated Scope
+                        app.directive("message3",function(){
+
+                          return{
+                            templateUrl:'msg1.html',
+                            transclude:true,
+                            scope:{},
+                            controller:function($scope,$element,$attrs){
+                              $scope.b = {
+                                y:20
+                              }
+                            }
+                          }
+
+
+                        });
+                        //custom data to Transclusion  Scope
+                          app.directive("message4",function(){
+
+                            return{
+                              templateUrl:'msg2.html',
+                              transclude:true,
+                              scope:{},
+                              controller:function($scope,$element,$attrs,$transclude){
+                                $scope.b = {
+                                  y:20
+                                };
+                                $transclude(function(transEl,$transScope){
+                                  $transScope.b={};
+                                  $transScope.b.y = $scope.b.y;
+                                  $element.find('#innerPanel').append(transEl);
+                                  console.log($element);
+                                  console.log(transEl);
+                                });
+                              }
+                            }
+
+
+                          });
+
+
+                          //custom Transclusion scope
+                            app.directive("message5",function(){
+
+                              return{
+                                templateUrl:'msg2.html',
+                                transclude:true,
+                                scope:{},
+                                controller:function($scope,$element,$attrs,$transclude){
+                                  $scope.b = {
+                                    y:20
+                                  };
+
+                                  var customScope = $scope.$new(true);
+                                  customScope.a = {
+                                    x:100
+                                  };
+                                  customScope.b = {
+                                    y:200
+                                  };
+                                  $transclude(customScope,function(transEl){
+                                    $element.find('#innerPanel').append(transEl);
+                                  })
+                                }
+                              }
+
+
+                            });
+
+
+
+
+  </script>
+</head>
+<body ng-app="app">
+  <!-- <div id="div1" ng-controller="sample">
+    <strong>Shared Scope </strong>
+    <br>
+
+    This is controller x = {{a.x}} y = {{b.y}}
+
+<div message1>
+Hi inner content transcluded
+x = {{a.x}} y = {{b.y}}
+</div>
+
+
+</div> -->
+
+<!-- <div id="div1" ng-controller="sample">
+  <strong>Inherited Scope </strong>
+  <br>
+
+  This is controller x = {{a.x}} y = {{b.y}}
+
+<div message2>
+Hi inner content transcluded
+x = {{a.x}} y = {{$parent.b.y}}
+</div>
+
+
+</div> -->
+<!-- <div id="div1" ng-controller="sample">
+  <strong>Isolated Scope </strong>
+  <br>
+
+  This is controller x = {{a.x}} y = {{b.y}}
+
+<div message3>
+Hi inner content transcluded
+x = {{a.x}} y = {{$parent.b.y}}
+</div>
+
+
+</div> -->
+<!-- <div id="div1" ng-controller="sample">
+  <strong>Manually Transcluded Scope </strong>
+  <br>
+
+  This is controller x = {{a.x}} y = {{b.y}}
+
+<div message4>
+Hi inner content transcluded
+x = {{a.x}} y = {{b.y}}
+</div>
+
+
+</div> -->
+<div id="div1" ng-controller="sample">
+  <strong>Manually Transcluded Scope </strong>
+  <br>
+
+  This is controller x = {{a.x}} y = {{b.y}}
+
+<div message5>
+Hi inner content transcluded
+x = {{a.x}} y = {{b.y}}
+</div>
+
+
+</div>
+  <script type="text/ng-template" id="msg1.html">
+    This is from template (directive)
+
+    x = {{$parent.a.x}} y = {{b.y}}
+    <br>
+    Inner Content
+    <div ng-transclude style="color:blue"></div>
+
+  </script>
+
+
+    <script type="text/ng-template" id="msg2.html">
+      This is from template (directive)
+
+      x = {{$parent.a.x}} y = {{b.y}}
+      <br>
+      Inner Content
+      <div id="innerPanel" style="color:blue"></div>
+
+    </script>
+
+
+
+</body>
+</html>

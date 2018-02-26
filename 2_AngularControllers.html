@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Controllers </title>
+  <script src="angular.min.js"></script>
+  <script type="text/javascript">
+    var sample = angular.module("sample",[]);
+    sample.controller("emp",function(){
+      this.Name = 'VSP';
+    });
+  </script>
+</head>
+<body ng-app="sample"><!-- <body ng-app="sample" ng-controller="emp as o">-->
+  <div ng-controller="emp as o">
+    Hello {{o.Name}}
+  </div>
+
+
+</body>
+</html>

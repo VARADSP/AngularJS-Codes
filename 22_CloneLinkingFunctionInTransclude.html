@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular JS Clone Linking Function In Transclude </title>
+<script src="jquery-3.2.1.min.js"></script>
+  <script src="angular.min.js"></script>
+  
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <script type="text/javascript">
+      var app = angular.module('app',[]);
+      app.controller('sample',['$scope',function($scope){
+
+
+      }]);
+
+    app.directive("message1",function(){
+      return {
+        templateUrl:'vsp.html',
+        transclude:true,
+        controller:function($scope,$element,$attrs,$transclude){
+          $element.find('#innerPanel1').append($transclude());
+
+        }
+      }
+    });
+    app.directive("message2",function(){
+      return{
+        templateUrl:'vsp.html',
+        transclude:true,
+        controller:function($scope,$element,$attrs,$transclude){
+            $transclude(function(transEl){
+              $element.find('#innerPanel1').append(transEl);
+            });
+        }
+      }
+
+    });
+
+
+
+
+
+  </script>
+</head>
+<body ng-app="app">
+  <div id="div1" ng-controller="sample">
+
+    This is controller
+    <br><hr>
+
+    Message1 <div message1>This is inner message</div>
+      </div>
+
+
+
+<script>
+  $(document).ready(function(){
+
+//  $('#div1').css('color','red');
+
+
+
+  });
+
+  </script>
+</body>
+</html>

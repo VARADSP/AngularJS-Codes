@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Js Routing Getting Started</title>
+<link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+
+<script src="jquery-3.2.1.min.js"></script>
+
+<script src="angular.min.js"></script>
+<script src="angular-route.js"></script>
+<style type="text/css">
+.well{
+  margin-bottom: 0px;
+}
+</style>
+
+<script type="text/javascript">
+var app = angular.module("app",['ngRoute']); // dependencies of ngRoute need to be provided
+app.config(['$routeProvider',function($routeProvider){
+  $routeProvider
+  .when('/first-msg',{
+  //  template:'<strong>This is first message </strong>'
+    templateUrl:'msg1.html',
+    controller:'message1',
+    caseInsensitiveMatch:true
+  })
+  .when('/second-msg',{
+//    template:'<strong>This is second message </strong>'
+  templateUrl:'msg2.html',
+  controller:'message2'
+  })
+  .when('/third-msg',{
+    //template:'<strong>This is third message </strong>'
+      //redirectTo:'/second-msg'
+      redirectTo:function(){
+        alert("Sorry not implemented yet .. will take you to first message now");
+        return '/first-msg';
+      }
+  })
+
+  .when('/',{
+//    template:'<strong>This is second message </strong>'
+  template:'<strong> Click One of the panel default route / </strong>'
+  })
+  .otherwise({
+    template:'<strong> No Content Available... Click one of the links from left panel </strong>'
+  })
+
+
+}]);
+
+
+app.controller("message1",['$scope',function($scope){
+  $scope.a = 19;
+  $scope.b = 20;
+
+}]);
+
+
+app.controller("message2",['$scope',function($scope){
+  $scope.a = 219;
+  $scope.b = 220;
+
+}]);
+
+</script>
+</head>
+<body ng-app="app">
+<div class="row">
+  <div class="col-sm-12 well">
+    header
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-3 well" style="height:700px">
+    <ul>
+      <li><a href="#!/first-msg">First</a></li>
+      <li><a href="#!/second-msg">Second</a></li>
+      <li><a href="#!/third-msg">Third</a></li>
+    </ul>
+
+  </div>
+  <div class="col-sm-9 well" style="height:700px">
+      <div ng-view>
+
+      </div>
+
+  </div>
+</div>
+  <script type="text/ng-template" id="msg1.html">
+    <div>
+      This is from message 1 template
+      a = {{a}} b = {{b}}
+    </div>
+  </script>
+  <script type="text/ng-template" id="msg2.html">
+    <div>
+      This is from message 2 template
+      a = {{a}} b = {{b}}
+    </div>
+  </script>
+</body>
+</html>

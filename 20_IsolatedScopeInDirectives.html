@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular JS Isolated Scope In Directive</title>
+  <script src="angular.min.js"></script>
+  <script src="jquery-3.2.1.min.js"></script>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <script type="text/javascript">
+      var app = angular.module('app',[]);
+      app.controller('sample',['$scope',function($scope){
+        // 
+         $scope.a=10;
+        $scope.b=20;
+        // $scope.p = 11;
+        // $scope.q = 22;
+
+        $scope.doSum = function(x,y){
+          var r = parseInt(x)+parseInt(y);
+          alert(" sum =" + r);
+        }
+
+      $scope.emp = {
+        empno:1001,
+        ename:'Jag'
+      };
+
+      $scope.emp2 = {
+        empno:1002,
+        ename:'VSP'
+      };
+
+
+
+      }]);
+
+    //Sending the object now with '='
+      app.directive('message',function(){
+        return{
+          templateUrl:'info-msg.html',
+          scope:{
+            employee: '='
+          }
+        }
+      });
+      //Sending the object now with '='
+        app.directive('message2',function(){
+          return{
+            templateUrl:'info-msg.html',
+            scope:{
+              employee: '=oEmp' // object name restricted works with '-' convention
+            }
+          }
+        });
+
+
+        app.directive('message3',function(){
+
+      return{
+        templateUrl:'info-msg.html',
+        scope:{
+          extSum : '&' // taking the function from parent
+        },
+        controller:function($scope,$element,$attrs){
+          $scope.doProcess = function(){
+              $scope.extSum({m:$scope.p,n:$scope.q*$scope.$parent.a});
+          }
+
+
+        }
+      }
+
+        });
+
+    // app.directive("message",function(){
+    //   return {
+    //     templateUrl:'info-msg.html',
+    //     scope:{
+    //       x:'@', // values coming here from template
+    //       y:'@'
+    //
+    //     },
+    //     controller:function($scope,$element,$attrs){
+    //       $scope.z = 40;
+    //       $scope.doProcess = function(){
+    //         var r = parseInt($scope.x) + parseInt($scope.y);
+    //         alert("Sum = " + r);
+    //       }
+    //     }
+    //   }
+    // });
+    //
+    // app.directive("message2",function(){
+    //   return {
+    //     templateUrl:'info-msg.html',
+    //     scope:{
+    //       x:'@m', // values coming here from template
+    //       y:'@n'
+    //
+    //     },
+    //     controller:function($scope,$element,$attrs){
+    //       $scope.z = 40;
+    //       $scope.doProcess = function(){
+    //         var r = parseInt($scope.x) + parseInt($scope.y);
+    //         alert("Sum = " + r);
+    //       }
+    //     }
+    //   }
+    // });
+    //
+
+
+
+
+
+
+
+
+
+
+  </script>
+</head>
+<body ng-app="app">
+  <div id="div1" ng-controller="sample">
+    <!-- Controller : a = {{a}} , b = {{b}} , p = {{p}} , q = {{q}}
+    <hr>
+
+    Directive 1 Instance 1 : <div message x="Hi", y="jag"></div><hr>
+
+     Interpolated Values From Parent Scope -->
+    <!-- Directive 2 Instance 2 : <div message x="{{p*10}}", y="{{q*10}}"></div><hr> -->
+
+    <!-- @ -> m and n sending to x and y -->
+    <!-- Directive 2 Instance 2 : <div message2 m="{{a}}", n="{{b}}"></div><hr> -->
+
+    Controller: empno = {{emp.empno}} , ename = {{emp.ename}} <br>
+    <hr><br>
+    Ename : <input ng-model="emp.ename">
+    <br>
+    Directive 1 Instance 1 : <div message employee="emp"></div>
+    <hr><br>
+      Directive 1 Instance 2 : <div message employee="emp2"></div>
+
+      <hr><br>
+        Directive 2 Instance 1 : <div message2 o-emp="emp2"></div>
+
+  <br><hr>
+    controller : a={{a}} , b = {{b}}
+  <button ng-click="doSum(a,b)">Sum </button>
+
+
+<hr><br>  <!--                        passing a function             -->
+  Directive 3 Instance 1 : <div message3 ext-sum="doSum"></div><br>
+  Directive 3 Instance 2 : <div message3 ext-sum="doSum(m,n)"></div><br>
+  </div>
+
+  <script type="text/ng-template" id="info-msg.html">
+    <!-- x = {{x}} , y = {{y}}
+
+    <button ng-click="doProcess()">Show</button> -->
+     <!-- working with '=' symbol -->
+    empno = {{employee.empno}} , ename = {{employee.ename}}
+    <br>
+    Ename : <input ng-model="employee.ename" />
+
+  <hr><br>
+
+p = {{p}} , q = {{q}}
+
+p: <input ng-model="p" /> , q : <input ng-model="q" />
+<button ng-click="extSum()(p,q)">SUm </button>
+<br>
+<button ng-click="extSum({m:p,n:q})">SUm with object sending</button>
+
+
+<br>
+
+
+<button ng-click="doProcess()">SUm with doProcess</button>
+<!-- passing the doSum parameters -->
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Controllers </title>
+  <script src="angular.min.js"></script>
+  <script type="text/javascript">
+    var sample = angular.module("sample",[]);
+    sample.controller("emp",function($scope){ // second version
+      $scope.Name = 'VSP';
+      $scope.Name1 = "Jag";
+    });
+    sample.controller("emp1",function($scope){
+      $scope.Name = 'VSP1111111';
+      $scope.Name1 = "Jag1111111111";
+    });
+    sample.controller("emp2",function($scope){
+      this.Name = 'VSP2222222221111111';
+      $scope.Name1 = "Jag22222222221111111111";
+    });
+    sample.controller("emp3",["$scope",function(c){ // Avoids minimizing scripts
+      this.Name = 'VSP2222222221111111';
+      c.Name1 = "Jag22222222221111111111";
+      c.getSalary = function(){
+        sal = 20000;
+        return sal;
+
+      }
+    }]);
+    sample.controller("emp4",["$scope",function($scope){ // hybrid approach to use $scope
+      $scope.o = this;
+      this.Name = 'VSP2222222221111111';
+      this.Name1 = "Jag22222222221111111111";
+    }]);
+  </script>
+</head>
+<body ng-app="sample"><!-- <body ng-app="sample" ng-controller="emp as o">-->
+  <div ng-controller="emp">
+    Hello {{Name1}}
+    Hello {{Name}}
+  </div>
+  <div ng-controller="emp1">
+    Hello {{Name1}}
+    Hello {{Name}}
+  </div>
+  <div ng-controller="emp2 as o">
+    Hello {{Name1}}
+    Hello {{o.Name}}
+  </div>
+  <div ng-controller="emp3 as o">
+    Hello {{Name1}}
+    Hello {{o.Name}}
+    Your Salary is {{getSalary()}}
+  </div>
+  <div ng-controller="emp4 as o">
+    Hello {{o.Name1}}
+    Hello {{o.Name}}
+  </div>
+
+</body>
+</html>

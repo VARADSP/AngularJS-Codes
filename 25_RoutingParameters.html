@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Js Routing Getting Started</title>
+<link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+
+<script src="jquery-3.2.1.min.js"></script>
+
+<script src="angular.min.js"></script>
+<script src="angular-route.js"></script>
+<style type="text/css">
+.well{
+  margin-bottom: 0px;
+}
+</style>
+
+
+<script type="text/javascript">
+var app = angular.module("app",['ngRoute']); // dependencies of ngRoute need to be provided
+app.config(['$routeProvider',function($routeProvider){
+  $routeProvider
+
+  .when('/sumurl/:a/:b',{
+//    template:'<strong>This is second message </strong>'
+  templateUrl:'sumurl.html',
+  controller:'sumurl'
+  })
+  .when('/sumfour/:a/:b/:c?/:d?',{//Optionals parameters
+//    template:'<strong>This is second message </strong>'
+  templateUrl:'sumfour.html',
+  controller:'sumfour'
+  })
+  .when('/suminput',{
+//    template:'<strong>This is second message </strong>'
+  templateUrl:'suminput.html',
+  controller:'suminput'
+  })
+  .when('/calc/:option/:a?/:b?',{ // redirecting using option parameter
+    redirectTo:function(params,path,search){
+      console.log(params); // parameter is returned
+      console.log(path); // path returned url path
+      console.log(search); // query string returned
+      //redirecting to other urls' based on conditions
+      if(params.option == "sum"){
+        return '/sumurl/'+(params.a-0) + '/'+(params.b-0);
+      }
+      else if(params.option == "input"){
+        return '/suminput';
+      }
+      else{
+        return '/';
+      }
+
+    }
+  })
+  .when('/',{
+//    template:'<strong>This is second message </strong>'
+  template:'<strong> Welcome to my app .. </strong><br><i>Click One of the links from left panel </i>'
+  })
+  .otherwise({
+    template:'<strong> No Content Available... Click one of the links from left panel </strong>'
+  })
+
+
+}]);
+
+
+app.controller("sumurl",['$scope','$routeParams',function($scope,$routeParams){
+$scope.a = $routeParams.a;
+$scope.b= $routeParams.b;
+
+
+}]);
+
+
+app.controller("suminput",['$scope','$location','$interpolate',function($scope,$location,$interpolate){
+$scope.a = 0;
+$scope.b= 0;
+
+
+$scope.doSum = function(){
+  var url = $interpolate("/sumurl/{{a}}/{{b}}")($scope);
+  console.log(url);
+  $location.path(url);
+
+}
+
+
+
+}]);
+
+
+app.controller("sumfour",['$scope','$routeParams',function($scope,$routeParams){
+$scope.a = $routeParams.a;
+$scope.b= $routeParams.b;
+$scope.c= $routeParams.c;
+$scope.d= $routeParams.d;
+
+
+}]);
+
+
+</script>
+
+
+
+</head>
+<body ng-app="app">
+<div class="row">
+  <div class="col-sm-12 well">
+    header | <a href="#!/">Home</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-3 well" style="height:700px">
+    <ul style="list-style:none">
+      <li><a href="#!/sumurl/10/20">Sum Url</a></li>
+        <li><a href="#!/suminput">Sum Input</a></li>
+            <li><a href="#!/sumfour/10/20/39/49">Sum Optionals</a></li>
+
+    </ul>
+
+  </div>
+  <div class="col-sm-9 well" style="height:700px">
+      <div ng-view>
+
+      </div>
+
+  </div>
+</div>
+  <script type="text/ng-template" id="sumurl.html">
+    <div>
+      This is from sumurl template
+      a = {{a}} b = {{b}} sum = {{(a-0) + (b-0)}}
+    </div>
+  </script>
+  <script type="text/ng-template" id="suminput.html">
+    <div>
+      a = <input class="form-control" style="width:30" type="text" ng-model="a" /><br>
+      b = <input class="form-control" style="width:30" type="text" ng-model="b" /><br>
+      <button ng-click="doSum()" class="btn btn-primary">Calculate Sum</button>
+
+
+    </div>
+  </script>
+  <script type="text/ng-template" id="sumfour.html">
+    <div>
+      a = {{a}}<br>
+      b = {{b}}<br>
+      c = {{c}}<br>
+      d = {{d}}<br>
+
+      Sum = {{(a-0)+(b-0)+(c-0)+(d-0)}}
+
+
+    </div>
+  </script>
+</body>
+</html>
