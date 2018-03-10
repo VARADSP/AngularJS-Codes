@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>UI Router Working With Parameters</title>
+  <link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+
+  <script src="jquery-3.2.1.min.js"></script>
+
+  <script src="angular.min.js"></script>
+  <script src="angular-ui-router.js"></script>
+
+</head>
+<script type="text/javascript">
+var app = angular.module("app",['ui.router']);
+
+app.config(['$stateProvider','$urlRouterProvider',function($stateProvider,$urlRouterProvider){
+  $stateProvider.state('firstMessage',{
+
+      url:'/first-msg/:a/:b',
+      templateUrl:'msg1.html',
+      controller:'msg1'
+
+
+  })
+  .state('secondMessage',{
+
+      url:'/first-msg/{a:[0-9]+}/{b}',
+      templateUrl:'msg1.html',
+      controller:'msg1'
+
+
+  })
+  .state('thirdMessage',{
+
+      url:'/third-msg/:a', //optional by default
+      templateUrl:'msg1.html',
+      controller:'msg1'
+
+
+  })
+  .state('fourthMessage',{
+
+      url:'/fourth-msg', //works only with ui-sref
+      templateUrl:'msg1.html',
+      controller:'msg1',
+      params:{ // default values
+        a:{value:1},
+        b:{value:2}
+      }
+
+
+  })
+  .state('fifthMessage',{//works with // only in routing url
+
+      url:'/fifth-msg/:a/:b', //works only with ui-sref
+      templateUrl:'msg1.html',
+      controller:'msg1',
+      params:{ // default values
+        a:{value:'1'},
+        b:{value:'2'}
+      }
+
+
+  })
+  .state('sixthMessage',{//works with // only in routing url
+
+      url:'/sixth-msg/:a/:b', //works only with ui-sref
+      templateUrl:'msg1.html',
+      controller:'msg1',
+      params:{ // default values
+        a:{value:'1',squash:true},
+        b:{value:'2',squash:true}
+      }
+
+
+  })
+
+
+  .state('root',{
+
+      url:'/',
+      template:'<strong>You are at the root .. click something else</strong>',
+
+
+
+  })
+  // .state('noroute',{
+  //
+  //     url:'*path',
+  //     template:'<strong>No route available .. try clicking on links</strong>',
+  //
+  //
+  //
+  // })
+  ;
+
+  $urlRouterProvider.otherwise('/');
+
+
+}]);
+
+
+app.controller("msg1",['$scope','$stateParams',function($scope,$stateParams){
+  $scope.a = $stateParams.a;
+  $scope.b = $stateParams.b;
+
+
+}]);
+
+app.controller("msg2",['$scope',function($scope){
+  $scope.c = 30;
+  $scope.d = 50;
+
+
+}]);
+</script>
+<body ng-app="app">
+  <!-- <div class="well"> -->
+  <!-- <a href="#!/">Home </a> | -->
+<!--
+    <a href="#!/first-msg">First Message </a> |
+    <a href="#!/second-msg">Second Message </a> -->
+
+
+<!--
+    <a ui-sref='firstMessage()'>First Message </a> |
+    <a ui-sref='secondMessage()'>Second Message </a> -->
+
+
+
+<!--
+</div> -->
+    <!-- <div ui-view>
+
+    </div> -->
+
+  <div class="row">
+    <div class="col-sm-12 well">
+      Header | <a href="#!/">Home</a>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3 well">
+    <ul style="list-style:none">
+      <!-- <li>  <a href="#!/first-msg/20/30">First Message </a></li> -->
+
+
+  <li>  <a ui-sref="firstMessage({a:20,b:30})">First Message </a></li>
+
+      <li><a ui-sref='secondMessage({a:200,b:300})'>Second Message </a></li>
+      <li><a ui-sref='thirdMessage(null)'>Third Message with no parameters </a></li>
+        <li><a ui-sref='fourthMessage({a:"hello",b:null})'>Fourth Message </a></li>
+    </ul>
+
+    <br><br>
+
+
+    <ul style="list-style:none">
+      <!-- <li>  <a href="#!/first-msg/20/30">First Message </a></li> -->
+
+
+  <li>  <a href="#!/first-msg/20/30">First Message </a></li>
+
+      <li><a href="#!/second-msg/demo/300">Second Message </a></li>
+      <li><a href="#!/third-msg/">Third Message with no parameters </a></li>
+      <li><a href="#!/fourth-msg/">Fourth Message </a></li>
+        <li><a href="#!/fifth-msg//">Fifth Message </a></li>
+              <li><a href="#!/sixth-msg/5">Sixth Message </a></li>
+    </ul>
+
+
+    </div>
+    <div class="col-sm-9 well">
+      <div ui-view>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+
+<script type="text/ng-template" id="msg1.html">
+    This is from msg1 template
+    a = {{a}} , b = {{b}}
+</script>
+
+<script type="text/ng-template" id="msg2.html">
+    This is from msg2 template
+    c = {{c}} , d = {{d}}
+</script>
+</html>

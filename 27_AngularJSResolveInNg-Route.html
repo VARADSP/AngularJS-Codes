@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Angular Js Resolve In Routing ng-route</title>
+<link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+
+<script src="jquery-3.2.1.min.js"></script>
+
+<script src="angular.min.js"></script>
+<script src="angular-route.js"></script>
+<style type="text/css">
+.well{
+  margin-bottom: 0px;
+}
+</style>
+
+
+<script type="text/javascript">
+var app = angular.module("app",['ngRoute']); // dependencies of ngRoute need to be provided
+app.config(['$routeProvider',function($routeProvider){
+  $routeProvider
+
+  .when('/calc/:option?/:a?/:b?',{
+//    template:'<strong>This is second message </strong>'
+  templateUrl:'calc.html',
+  controller:'calcController'
+  })
+  .when('/calc/mulitply/:a/:b',{
+//    template:'<strong>This is second message </strong>'
+  templateUrl:'calc.html',
+  controller:'calcMultiplyController',
+  resolve:{
+    result: function(dataService,$route){
+      var a = $route.current.params.a;
+      var b = $route.current.params.b;
+      return dataService.multiply(a,b);
+
+    }
+  }
+  })
+  .when('/',{
+//    template:'<strong>This is second message </strong>'
+  template:'<strong> Welcome to my app .. </strong><br><i>Click One of the links from left panel </i>'
+  })
+  .otherwise({
+    template:'<strong> No Content Available... Click one of the links from left panel </strong>'
+  })
+
+
+}]);
+
+
+
+
+app.controller("calcController",['$scope','$routeParams','dataService','$location','$routeParams','$route',function($scope,$routeParams,dataService,$location,$routeParams,$route){
+console.log('in controller ...');
+$scope.a = 0;
+$scope.b=0;
+
+  if($routeParams.a){
+    $scope.a = $routeParams.a;
+
+
+
+  }
+  if($routeParams.b){
+      $scope.b = $routeParams.b;
+  }
+
+  if($routeParams.option && $routeParams.a && $routeParams.b){
+    if($routeParams.option == "add"){
+      console.log('Service call started ');
+      $scope.isLoading = true;
+
+      dataService.add($scope.a,$scope.b).then(function(result){
+        $scope.result = result;
+        console.log('service call completed ... ');
+        $scope.isLoading = false;
+  });
+    }
+    else if($routeParams.option == "multiply"){
+      console.log('Service call started ');
+        $scope.isLoading = true;
+
+      dataService.multiply($scope.a,$scope.b).then(function(result){
+        $scope.result = result;
+        console.log('service call completed ... ');
+    $scope.isLoading = false;
+  });
+    }
+    else {
+      $location.url('/calc');
+    }
+  }
+
+$scope.doAdd = function(){
+  console.log($route);
+  // dataService.add($scope.a,$scope.b).then(function(result){
+  //   $scope.result = result;
+    var path = '/calc/add/' + $scope.a + '/' + $scope.b;
+    // $location.url(path);
+
+    if($location.path() == path){
+      $route.reload();
+    }else{
+      $location.url(path);
+
+    }
+  }
+  $scope.doMultiply = function(){
+    // dataService.add($scope.a,$scope.b).then(function(result){
+    //   $scope.result = result;
+      var path = '/calc/multiply/' + $scope.a + '/' + $scope.b;
+      $location.url(path);
+    }
+    $scope.doUpdateResults = function(){
+      // dataService.add($scope.a,$scope.b).then(function(result){
+      //   $scope.result = result;
+      // $route.reload();
+      $route.updateParams({
+        a:$scope.a,
+        b:$scope.b
+      });
+      }
+
+
+}]);
+
+app.run(['$rootScope',function($rootScope){
+
+$rootScope.$on('$routeChangeStart',function(e,current,prev){
+        console.log('in $routeChangeStart');
+        $('#body').css('background','blue');
+        $(document).css('color','blue');
+$rootScope.isLoading = true;
+
+});
+
+$rootScope.$on('$routeChangeSuccess',function(e,current,prev){
+        console.log('in $routeChangeSuccess');
+        $rootScope.isLoading = false;
+});
+
+$rootScope.$on('$locationChangeStart',function(e,currUrl,prevUrl,currState,prevState){
+        console.log('in $locationChangeStart url' + currUrl);
+  $rootScope.isLoading = true;
+});
+
+
+$rootScope.$on('$locationChangeSuccess',function(e,current,prev){
+        console.log('in $locationChangeSuccess new url ' + current);
+  $rootScope.isLoading = false;
+});
+
+}]);
+
+app.config(["dataServiceProvider",function(dataServiceProvider){
+  dataServiceProvider.config("http://localhost:4467/");
+}]);
+app.provider('dataService',function(){
+  var baseUrl = '';
+
+  this.config = function(url){
+    baseUrl = url;
+  };
+
+  this.$get = ['$http','$log',function($http,$log){
+    var oDataService = {};
+    oDataService.add = function(a,b){
+      return $http({
+        url:baseUrl + 'Sum?a='+a+'&b='+b+'',
+        method:'GET'
+      });
+    }
+    oDataService.multiply = function(a,b){
+      return $http({
+        url:baseUrl + 'Multiply?a='+a+'&b='+b+'',
+        method:'GET'
+      });
+    }
+
+    return oDataService;
+  }];
+
+});
+
+app.controller("calcMultiplyController",["$scope","result",function($scope,result){
+  $scope.result = result;
+
+}]);
+
+
+</script>
+
+
+
+</head>
+<body id="body" ng-app="app">
+<div class="row">
+  <div class="col-sm-12 well">
+    header | <a href="#!/">Home</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-3 well" style="height:700px">
+    <ul style="list-style:none">
+      <li><a href="#!/calc">Calculate Sum</a></li>
+        <li></li>
+            <li></li>
+
+    </ul>
+
+  </div>
+  <div class="col-sm-9 well" style="height:700px">
+      <div ng-view>
+
+      </div>
+
+  </div>
+</div>
+  <script type="text/ng-template" id="calc.html">
+    <div>
+      a = <input type="text" ng-model="a"><br>
+      b = <input type="text" ng-model="b"><br>
+      <button ng-click="doAdd()">Add</button>
+      <button ng-click="doMultiply()">Multiply</button>
+  <hr><br>
+  <button ng-click="doUpdateResults()">Update Result</button>
+    <div ng-show="isLoading == true">
+      <hr>
+      <span style="color:red"> Loading .. Please Wait..</span>
+    </div>
+    </div>
+    <div ng-show="result">
+    <hr>
+    Calculated Result = {{result.data}}
+  </div>
+  </script>
+
+</body>
+</html>

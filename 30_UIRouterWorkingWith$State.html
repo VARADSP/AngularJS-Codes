@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>UI Router Working with $state</title>
+  <link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="animate.css" type="text/css" rel="stylesheet">
+
+  <script src="jquery-3.2.1.min.js"></script>
+
+  <script src="angular.min.js"></script>
+  <script src="angular-ui-router.js"></script>
+
+</head>
+<script type="text/javascript">
+var app = angular.module("app",['ui.router']);
+
+app.config(['$stateProvider','$urlRouterProvider',function($stateProvider,$urlRouterProvider){
+  $stateProvider.state('calc',{
+
+      url:'/calc',
+      templateUrl:'calc.html',
+      controller:'calc'
+
+
+  })
+  .state("add",{
+    url:'/add/:a/:b',
+    templateUrl:'result.html',
+    controller:'addController',
+    data:{ //providing custom info with json formate could use firebase here
+        multiplier:10
+    }
+
+  })
+
+  .state('root',{
+
+      url:'/',
+      template:'<strong>You are at the root .. click something else</strong>',
+
+
+
+  })
+  .state('otherwise',{
+        url:"*path",
+        template:'<strong>No Route Available</strong>'
+
+  })
+  // .state('noroute',{
+  //
+  //     url:'*path',
+  //     template:'<strong>No route available .. try clicking on links</strong>',
+  //
+  //
+  //
+  // })
+  ;
+
+  $urlRouterProvider.otherwise('/');
+
+
+}]);
+
+
+
+app.controller("calc",['$scope','$state',function($scope,$state){
+  $scope.a = 0;
+  $scope.b = 0;
+
+
+
+
+  $scope.doAdd = function(){
+    $state.go('add',{
+      a:$scope.a,
+      b:$scope.b
+    });
+  }
+
+
+}]);
+
+app.controller("addController",['$scope','$stateParams','$state','dataService',function($scope,$stateParams,$state,dataService){
+
+console.log($state.get("add"));
+
+
+$scope.a =0;
+$scope.b=0;
+
+
+//$scope.a = $state.params.a;
+//$scope.b = $state.params.b;
+
+
+  if($stateParams.a){
+    $scope.a = $stateParams.a;
+
+  }
+  if($stateParams.b){
+    $scope.b = $stateParams.b;
+
+  }
+
+  $scope.goBack = function(){
+      $state.go('calc');
+
+  }
+//
+// $scope.result = (parseInt($scope.a) + parseInt($scope.b))*$state.current.data.multiplier;
+$scope.isLoading = true;
+
+dataService.add($scope.a,$scope.b).then(function(r){
+  $scope.result = (r.data);
+$scope.isLoading = false;
+});
+
+}]);
+
+
+
+
+app.config(["dataServiceProvider",function(dataServiceProvider){
+  dataServiceProvider.config("http://localhost:4467/");
+}]);
+app.provider('dataService',function(){
+  var baseUrl = '';
+
+  this.config = function(url){
+    baseUrl = url;
+  };
+
+  this.$get = ['$http','$log',function($http,$log){
+    var oDataService = {};
+    oDataService.add = function(a,b){
+      return $http({
+        url:baseUrl + 'Sum?a='+a+'&b='+b+'',
+        method:'GET'
+      });
+    }
+    oDataService.multiply = function(a,b){
+      return $http({
+        url:baseUrl + 'Multiply?a='+a+'&b='+b+'',
+        method:'GET'
+      });
+    }
+
+    return oDataService;
+  }];
+
+});
+
+app.run(['$rootScope',function($rootScope){
+  $rootScope.$on('$stateChangeStart',function(e,toState,toParams,fromState,fromParams,options){
+    console.log(' in $stateChangeStart Event');
+    console.log(toState);
+    console.log(fromState);
+    
+  });
+
+  $rootScope.$on("$stateChangeSuccess",function(e,toState,toParams,fromState,fromParams){
+    console.log(' in $stateChangeSuccess ');
+  });
+}]);
+
+
+
+</script>
+<body ng-app="app">
+  <!-- <div class="well"> -->
+  <!-- <a href="#!/">Home </a> | -->
+<!--
+    <a href="#!/first-msg">First Message </a> |
+    <a href="#!/second-msg">Second Message </a> -->
+
+
+<!--
+    <a ui-sref='firstMessage()'>First Message </a> |
+    <a ui-sref='secondMessage()'>Second Message </a> -->
+
+
+
+<!--
+</div> -->
+    <!-- <div ui-view>
+
+    </div> -->
+
+  <div class="row">
+    <div class="col-sm-12 well">
+      Header | <a href="#!/">Home</a>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3 well">
+    <ul style="list-style:none">
+      <li>  <a href="#!/calc">Calculator </a></li>
+
+    </ul>
+    </div>
+    <div class="col-sm-9 well">
+      <div ui-view>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+
+<script type="text/ng-template" id="calc.html">
+
+    a = <input type="text" ng-model="a"><br>
+    b = <input type="text" ng-model="b">
+
+    <br>
+    <button class="btn btn-default" ng-click="doAdd()">
+      Add
+    </button>
+
+</script>
+
+<script type="text/ng-template" id="result.html">
+
+
+    <button class="btn btn-warning" ng-click="goBack()"> << Back</button>
+<br>
+    <a ui-sref="calc"><< Back</a>
+          <hr>
+          <div ng-show="isLoading == true">
+            <span class="animated flash infinite" style="color:red">Loading.. Please Wait..</span>
+          </div>
+
+      <div ng-hide="isLoading == true">
+      Calculated Result = {{result}}
+    </div>
+
+
+</script>
+
+</html>

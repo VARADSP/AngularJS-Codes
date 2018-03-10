@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>UI Router Multiple Views wiht ui-view</title>
+  <link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+
+  <script src="jquery-3.2.1.min.js"></script>
+
+  <script src="angular.min.js"></script>
+  <script src="angular-ui-router.js"></script>
+
+</head>
+<script type="text/javascript">
+var app = angular.module("app",['ui.router']);
+
+app.config(['$stateProvider','$urlRouterProvider',function($stateProvider,$urlRouterProvider){
+  $stateProvider.state('firstMessage',{
+
+      url:'/first-msg',
+      templateUrl:'msg1.html',
+      controller:'msg1'
+
+
+  })
+  .state('sample02',{
+      url:'/sample02',
+      views:{
+        '':{
+          templateUrl:'msg1.html',
+          controller:'msg1'
+        },
+        'test':{
+          template:'<strong>Testing Info </strong>'
+
+        }
+      }
+  })
+  .state('employees',{
+    url:'/employees',
+    views:{
+      'emp-header':{
+        templateUrl:'emp-header.html'
+      },
+      'emp-list':{
+        templateUrl:'emp-list.html',
+        controller:'empListController'
+      }
+    }
+  })
+  .state('employeesDetails',{
+    url:'/employees/:empno',
+    views:{
+      'emp-header':{
+        templateUrl:'emp-header.html'
+      },
+      'emp-detail':{
+        templateUrl:'emp-detail.html',
+        controller:'empDetailController'
+      }
+    }
+  })
+  .state('root',{
+
+      url:'/',
+      template:'<strong>You are at the root .. click something else</strong>',
+
+
+
+  })
+  // .state('noroute',{
+  //
+  //     url:'*path',
+  //     template:'<strong>No route available .. try clicking on links</strong>',
+  //
+  //
+  //
+  // })
+  ;
+
+  $urlRouterProvider.otherwise('/');
+
+
+}]);
+
+
+app.controller("msg1",['$scope',function($scope){
+  $scope.a = 10;
+  $scope.b = 20;
+
+
+}]);
+
+
+app.controller("empListController",['$scope','dataService',function($scope,dataService){
+    $scope.isLoading = true;
+
+    dataService.getEmployees().then(function(result){
+      $scope.result = result;
+        $scope.isLoading = false;
+    });
+
+
+}]);
+
+app.controller("empDetailController",['$scope','dataService','$stateParams',function($scope,dataService,$stateParams){
+    $scope.isLoading = true;
+  $scope.isNotFound = false;
+
+  console.log($stateParams.empno);
+
+  dataService.getEmployee($stateParams.empno).then(function(result){
+
+    if(result.data !=null){
+      console.log(result.data);
+      $scope.employee = result.data;
+
+    }
+    else{
+      $scope.isNotFound= true;
+
+    }
+    $scope.isLoading=false;
+
+  });
+
+
+}]);
+
+
+
+
+app.config(["dataServiceProvider",function(dataServiceProvider){
+  dataServiceProvider.config("https://jsonplaceholder.typicode.com");
+}]);
+app.provider('dataService',function(){
+  var baseUrl = '';
+
+  this.config = function(url){
+    baseUrl = url;
+  };
+
+  this.$get = ['$http','$log',function($http,$log){
+
+
+    var oDataService = {};
+
+   oDataService.getEmployees = function(){
+     return $http({
+         url:baseUrl + '/users',
+         method:'GET'
+     });
+   };
+   oDataService.getEmployeesByDeptno = function(deptno){
+     return $http({
+       url:baseUrl + '/users/'+deptno,
+       method:'GET'
+     });
+   };
+
+   oDataService.getEmployee = function(empno){
+     return $http({
+       url:baseUrl +'/users/'+empno,
+       method:'GET'
+     });
+   };
+
+
+    return oDataService;
+  }];
+
+});
+
+
+
+</script>
+<body ng-app="app">
+  <!-- <div class="well"> -->
+  <!-- <a href="#!/">Home </a> | -->
+<!--
+    <a href="#!/first-msg">First Message </a> |
+    <a href="#!/second-msg">Second Message </a> -->
+
+
+<!--
+    <a ui-sref='firstMessage()'>First Message </a> |
+    <a ui-sref='secondMessage()'>Second Message </a> -->
+
+
+
+<!--
+</div> -->
+    <!-- <div ui-view>
+
+    </div> -->
+
+  <div class="row">
+    <div class="col-sm-12 well">
+      Header | <a href="#!/">Home</a>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3 well">
+    <ul style="list-style:none">
+      <li>  <a ui-sref='firstMessage()'>First Message </a></li>
+      <li>  <a href='#!/sample02'>Sample 02 </a></li>
+        <li>  <a href='#!/employees'>Employees </a></li>
+
+    </ul>
+    </div>
+    <div class="col-sm-9 well">
+      <div ui-view>
+
+      </div> <hr>
+
+      <div ui-view="test">
+
+      </div>
+
+      <div class="row">
+          <div class="col-sm-12">
+                  <div ui-view="emp-header">
+
+                  </div>
+          </div>
+          <div class="col-sm-12">
+                    <div ui-view="emp-list">
+          </div>
+          <div class="col-sm-12">
+                    <div ui-view="emp-detail">
+          </div>
+
+      </div>
+
+
+    </div>
+  </div>
+
+</body>
+
+
+<script type="text/ng-template" id="msg1.html">
+    This is from msg1 template
+    a = {{a}} , b = {{b}}
+</script>
+
+<script type="text/ng-template" id="emp-header.html">
+    <div class="panel-body" style="text=align:center;margin:0 auto">
+      <h1>Employee Data</h1>
+    </div>
+</script>
+
+<script type="text/ng-template" id="emp-list.html">
+    <div class="panel panel-primary">
+  <div class="panel-body">
+
+    <div ng-show="isLoading" style="color:red">
+      <span class="glyphicon glyphicon-time"></span>Loading...
+
+    </div>
+    <div ng-show="!isLoading">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Email</th>
+
+            </tr>
+            <tbody>
+              <tr ng-repeat="oEmp in result.data">
+                <td><a href="#!/employees/{{oEmp.id}}">{{oEmp.id}}</a></td>
+                <td>{{oEmp.name}}</td>
+                <td>{{oEmp.username}}</td>
+                <td>{{oEmp.email}}</td>
+              </tr>
+            </tbody>
+          </thead>
+        </table>
+    </div>
+  </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="emp-detail.html">
+<div class="panel panel-primary">
+  <div class="panel-body">
+
+    <div ng-show="isLoading" style="color:red">
+      <span class="glyphicon glyphicon-time"></span>Loading...
+
+    </div>
+
+<div ng-show="isNotFound" style="color:red">
+  <span class="glyphicon glyphicon-thumbs-down"></span>Employee Not Found
+  <hr>
+  <a href="#!/employees" class="btn btn-danger">
+  <i class="glyphicon glyphicon-chevron-left"></i>Go to Employee List
+</a>
+</div>
+
+<div ng-show="employee">
+  <div class="row">
+    <div class="col-sm-12">
+      <a href="#!/employees" class="btn btn-primary">
+        <i class="glyphicon glyphicon-chevron-left"></i>Back
+
+      </a>
+    </div>
+
+
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-sm-4">
+      <strong>Employee Name </strong>
+    </div>
+    <div class="col-sm-7">
+      {{employee.name}}
+    </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <strong>Employee Email </strong>
+      </div>
+      <div class="col-sm-7">
+        {{employee.email}}
+      </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">
+          <strong>Employee Address </strong>
+        </div>
+        <div class="col-sm-7">
+          {{employee.address | json:12}}
+        </div>
+        </div>
+
+  </div>
+</div>
+</div>
+
+</div>
+
+</script>
+
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>UI Router Nested States In Angular JS</title>
+  <link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+
+  <script src="jquery-3.2.1.min.js"></script>
+
+  <script src="angular.min.js"></script>
+  <script src="angular-ui-router.js"></script>
+
+</head>
+<script type="text/javascript">
+
+  var app = angular.module("app",[]);
+
+  app.controller("calc1",['$scope','$rootScope',function($scope,$rootScope){
+
+      $scope.a = 10;
+      $scope.b = 20;
+
+      $scope.doCalc1Emit1 = function(){
+        $scope.$emit("MyCalc1Emit1Event");
+      };
+
+
+            $scope.doCalc1Broadcast1 = function(){
+              $scope.$broadcast("MyCalc1Broadcast1Event");
+            };
+
+
+            $scope.doCalc1BroadcastRoot = function(){
+              $rootScope.$broadcast("MyCalc1BroadcastRootEvent")
+            };
+
+      $scope.$on("MyCalc1Emit1Event",function(e,data){
+
+          console.log("calc1.MyCalc1Emit1Event - raised by emit");
+            // console.log(data);
+            // console.log(e);
+
+      });
+
+
+
+
+
+            $rootScope.$on("MyCalc1Emit1Event",function(e,data){
+
+                console.log("root.calc1.MyCalc1Emit1Event - raised by emit");
+
+
+            });
+
+
+
+
+            $scope.$on("MyCalc1Broadcast1Event",function(e,data){
+
+                console.log("calc1.MyCalc1Broadcast1Event - raised by brodcast");
+                  // console.log(data);
+                  // console.log(e);
+
+            });
+
+            $rootScope.$on("MyCalc1BroadcastRootEvent",function(e,data){
+
+                console.log("root.parent.MyCalc1RootBroadcast1Event - raised by brodcast");
+                  // console.log(data);
+                  // console.log(e);
+
+            });
+
+
+
+
+  }]);
+
+  app.controller("calc2",['$scope','$rootScope',function($scope,$rootScope){
+
+    $scope.c = 30;
+    $scope.d = 40;
+
+
+    $rootScope.$on("MyCalc1Emit1Event",function(e,data){
+
+        console.log("root.sibling.MyCalc1Emit1Event - raised by emit");
+
+
+    });
+
+
+
+    $scope.$on("MyCalc1Broadcast1Event",function(e,data){
+
+        console.log("sibling.MyCalc1Broadcast1Event - raised by brodcast");
+          // console.log(data);
+          // console.log(e);
+
+    });
+
+
+    $rootScope.$on("MyCalc1BroadcastRootEvent",function(e,data){
+
+        console.log("root.siblings.MyCalc1RootBroadcast1Event - raised by brodcast");
+          // console.log(data);
+          // console.log(e);
+
+    });
+
+
+  }]);
+
+  app.controller("childcalc1",['$scope','$rootScope',function($scope,$rootScope){
+
+    $rootScope.$on("MyCalc1Emit1Event",function(e,data){
+
+        console.log("root.child.MyCalc1Emit1Event - raised by emit");
+
+
+    });
+    $scope.$on("MyCalc1Broadcast1Event",function(e,data){
+
+        console.log("child.MyCalc1Broadcast1Event - raised by brodcast");
+          // console.log(data);
+          // console.log(e);
+
+    });
+
+    $rootScope.$on("MyCalc1BroadcastRootEvent",function(e,data){
+
+        console.log("root.child.MyCalc1RootBroadcast1Event - raised by brodcast");
+          // console.log(data);
+          // console.log(e);
+
+    });
+
+
+
+  }]);
+
+  app.run(['$rootScope',function($rootScope){
+
+    $rootScope.$on("MyCalc1BroadcastRootEvent",function(e,data){
+
+        console.log("root.module.MyCalc1RootBroadcast1Event - raised by brodcast root");
+          // console.log(data);
+          // console.log(e);
+
+    });
+
+
+  }]);
+
+</script>
+<body ng-app="app">
+
+<div ng-controller="calc1" style="border:1px solid blue;margin:5px;padding:5px;">
+  <strong>Parent Controller </strong><br>
+  a  = {{a}}<br>
+  b = {{b}}<br>
+  sum = {{a+b}}
+
+  <button ng-click="doCalc1Emit1()">Calculate 1 Emit 1</button>
+
+
+  <button ng-click="doCalc1Broadcast1()">Calculate 1 Broadcast 1</button>
+
+  <button ng-click="doCalc1BroadcastRoot()">Calculate 1 Root Broadcast 1</button>
+  <div ng-controller="childcalc1" style="border:1px solid green;margin:5px;padding:5px">
+      <strong>Child Controller </strong>
+  </div>
+</div>
+  <div ng-controller="calc2" style="border:1px solid blue;margin:5px;padding:5px">
+    <strong>Sibling</strong><br>
+    c = {{c}}<br>
+    d = {{d}}<br>
+    sum = {{c+d}}
+
+  </div>
+</body>
+
+</html>
